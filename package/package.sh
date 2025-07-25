@@ -35,7 +35,7 @@ vk_swiftshader_icd.json
 xdg-mime
 xdg-settings"
 
-echo "copying release files and create compressed archive ${FILE_PREFIX}_linux.tar.xz"
+echo "Copying release files and creating ${FILE_PREFIX}_linux.tar.xz"
 
 mkdir -p ${CURRENT_DIR}/${FILE_PREFIX}_linux
 
@@ -46,7 +46,7 @@ done
 SIZE="$(du -sk "${FILE_PREFIX}_linux" | cut -f1)"
 tar cf - ${FILE_PREFIX}_linux | pv -s"${SIZE}k" | xz > ${FILE_PREFIX}_linux.tar.xz
 
-# create AppImage using appimagetool
+# Create AppImage
 rm -rf ${APP_DIR}
 mkdir -p ${APP_DIR}/opt/ungoogled-chromium/ ${APP_DIR}/usr/share/icons/hicolor/48x48/apps/
 mv ${CURRENT_DIR}/${FILE_PREFIX}_linux/* ${APP_DIR}/opt/ungoogled-chromium/
@@ -66,13 +66,13 @@ chmod a+x ${APP_DIR}/AppRun
 cp ${APP_DIR}/opt/ungoogled-chromium/product_logo_48.png ${APP_DIR}/usr/share/icons/hicolor/48x48/apps/chromium.png
 cp ${APP_DIR}/usr/share/icons/hicolor/48x48/apps/chromium.png ${APP_DIR}
 
-# download appimagetool if not in PATH or locally present
+# Download appimagetool if not in PATH
 if ! command -v appimagetool >/dev/null; then
     if [ ! -f ./appimagetool ] ; then
         URL=$(curl -s https://api.github.com/repos/AppImage/appimagetool/releases/latest | jq '.assets[].browser_download_url' | grep x86_64 | sed 's/"//g')
         wget -q --show-progress -O appimagetool $URL && chmod +x appimagetool
     fi
-    export PATH=".:$PATH"
+    export PATH="${CURRENT_DIR}:$PATH"
 fi
 
 APPIMAGETOOL_APP_NAME=$APP_NAME ARCH=$ARCH VERSION=$VERSION appimagetool -u \
