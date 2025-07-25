@@ -4,7 +4,7 @@ CURRENT_DIR=$(dirname $(readlink -f $0))
 ROOT_DIR=$(cd ${CURRENT_DIR}/.. && pwd)
 GIT_SUBMODULE="ungoogled-chromium"
 
-DEBIAN_VER=${1:-'bullseye-slim'}
+DEBIAN_VER=${1:-'trixie-slim'}
 
 IMAGE="ungoogled-chromium-${DEBIAN_VER}:packager"
 
