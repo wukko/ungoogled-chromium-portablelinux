@@ -27,7 +27,6 @@ RUN apt-get -y install git python3-httplib2 python3-pyparsing python-six rsync s
 
 # create builder user
 RUN groupadd -g 1000 builder && useradd -d /home/builder -g 1000 -u 1000 builder
-COPY builder /home/builder
 RUN chown -R builder:builder /home/builder
 # create workdir to mount in docker build
 RUN mkdir /repo
