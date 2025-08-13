@@ -17,7 +17,7 @@ setup_paths() {
     _dl_cache="${_build_dir}/_download_cache"
     _src_dir="${_build_dir}/src"
     _out_dir="${_src_dir}/out/Default"
-    mkdir -p "${_dl_cache}"
+    mkdir -p "${_dl_cache}" "${_out_dir}"
 }
 
 fetch_sources() {
@@ -36,7 +36,6 @@ fetch_sources() {
         "${_main_repo}/utils/downloads.py" unpack -i "${_main_repo}/downloads.ini" -c "${_dl_cache}" "${_src_dir}"
     fi
 
-    mkdir -p "${_out_dir}"
     touch "${stamp}"
 }
 
