@@ -22,7 +22,6 @@ if [ ! -d "build" ]; then
     exit 1
 fi
 
-echo "Creating cache archive at ${_cache_tar}"
 mkdir -p "$(dirname "${_cache_tar}")"
 
 # create archive via stream to avoid tar flag incompatibilities
@@ -31,7 +30,5 @@ if [ "$_use_zstd" -eq 1 ]; then
 else
     tar -cf - "build" | xz -T0 -c > "${_cache_tar}"
 fi
-
-echo "Cache archive created: ${_cache_tar}"
 
 popd >/dev/null
