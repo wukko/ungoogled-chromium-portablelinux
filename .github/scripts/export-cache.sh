@@ -9,11 +9,10 @@ if command -v zstd >/dev/null 2>&1; then
 fi
 
 _ext="tar.xz"
-_cache_tar="${_base_dir}/.github/cache/build-cache.${_ext}"
 if [ "$_use_zstd" -eq 1 ]; then
     _ext="tar.zst"
-    _cache_tar="${_base_dir}/.github/cache/build-cache.${_ext}"
 fi
+_cache_tar="${_base_dir}/.github/cache/build-cache.${_ext}"
 
 pushd "${_base_dir}" >/dev/null
 
@@ -26,9 +25,9 @@ mkdir -p "$(dirname "${_cache_tar}")"
 
 # create archive via stream to avoid tar flag incompatibilities
 if [ "$_use_zstd" -eq 1 ]; then
-    tar -cf - "build" | zstd -T0 -3 -o "${_cache_tar}"
+    tar -cf - "build" | zstd -f -T0 -3 -o "${_cache_tar}"
 else
-    tar -cf - "build" | xz -T0 -c > "${_cache_tar}"
+    tar -cf - "build" | xz -f -T0 -3 -c > "${_cache_tar}"
 fi
 
 popd >/dev/null
