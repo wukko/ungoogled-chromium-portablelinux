@@ -10,10 +10,27 @@ inputs:
     description: "If 'true', run only preparation steps."
     required: false
     default: "false"
+  use-existing-image:
+    description: "If 'true', skip Docker image building and use existing image."
+    required: false
+    default: "false"
 
 runs:
   using: composite
   steps:
+    - name: Download Docker image
+      if: ${{ inputs.use-existing-image == 'true' }}
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+        path: /tmp
+      continue-on-error: false
+
+    - name: Load Docker image
+      if: ${{ inputs.use-existing-image == 'true' }}
+      shell: bash
+      run: docker load -i /tmp/chromium-builder.tar
+
     - name: Download build cache
       uses: actions/download-artifact@v4
       with:
@@ -30,6 +47,7 @@ runs:
       env:
         _task_timeout: ${{ inputs.task-timeout }}
         _prepare_only: ${{ inputs.prepare-only == 'true' && '1' || '' }}
+        _use_existing_image: ${{ inputs.use-existing-image == 'true' && '1' || '' }}
       run: bash ./scripts/docker-build.sh
 
     - name: Export build cache
