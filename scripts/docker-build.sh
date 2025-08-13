@@ -6,11 +6,11 @@ _git_submodule="ungoogled-chromium"
 
 _image="chromium-builder:trixie-slim"
 
-echo "building docker image '${_image}'"
-if ! docker image inspect "${_image}" >/dev/null 2>&1; then
-(
+if [ -z "${_use_existing_image:-}" ]; then
+    echo "building docker image '${_image}'"
     cd "${_base_dir}/docker" && docker buildx build --load -t "${_image}" -f ./build.Dockerfile .
-)
+else
+    echo "using existing docker image '${_image}'"
 fi
 
 # choose entrypoint: CI or local
@@ -24,6 +24,7 @@ _extra_env=()
 [ -n "${_task_timeout:-}" ] && _extra_env+=(-e "_task_timeout")
 [ -n "${TASK_TIMEOUT:-}" ] && _extra_env+=(-e "TASK_TIMEOUT")
 [ -n "${_prepare_only:-}" ] && _extra_env+=(-e "_prepare_only")
+[ -n "${_use_existing_image:-}" ] && _extra_env+=(-e "_use_existing_image")
 
 # match host user to avoid permission issues on bind mount
 _user_uidgid="$(id -u):$(id -g)"

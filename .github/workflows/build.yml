@@ -9,6 +9,8 @@ jobs:
   prep:
     name: Prepare resources
     runs-on: ubuntu-latest
+    outputs:
+      image-digest: ${{ steps.build-image.outputs.digest }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -18,11 +20,30 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Build and cache Docker image
+        id: build-image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker
+          file: ./docker/build.Dockerfile
+          tags: chromium-builder:trixie-slim
+          outputs: type=docker,dest=/tmp/chromium-builder.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Upload Docker image
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/chromium-builder.tar
+          retention-days: 1
+
       - id: build_part_00
         name: build_part_00 (prepare only)
         uses: ./.github/actions/build
         with:
           prepare-only: true
+          use-existing-image: true
 
   build_part_01:
     name: build_part_01
@@ -32,8 +53,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_02:
     name: build_part_02
@@ -43,8 +65,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_03:
     name: build_part_03
@@ -54,8 +77,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_04:
     name: build_part_04
@@ -65,8 +89,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_05:
     name: build_part_05
@@ -76,8 +101,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_06:
     name: build_part_06
@@ -87,8 +113,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_07:
     name: build_part_07
@@ -98,8 +125,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_08:
     name: build_part_08
@@ -109,8 +137,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_09:
     name: build_part_09
@@ -120,8 +149,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   build_part_10:
     name: build_part_10
@@ -131,8 +161,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: docker/setup-buildx-action@v3
       - uses: ./.github/actions/build
+        with:
+          use-existing-image: true
 
   package:
     name: Package AppImage
