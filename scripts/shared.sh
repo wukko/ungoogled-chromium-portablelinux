@@ -77,18 +77,8 @@ setup_toolchain() {
     ln -sf /usr/bin/node "${_src_dir}/third_party/node/linux/node-linux-x64/bin/node"
 
     local clang_bin="${_src_dir}/third_party/llvm-build/Release+Asserts/bin"
-    if command -v ccache >/dev/null 2>&1; then
-        export CCACHE_DIR="${_root}/.ccache"
-        mkdir -p "${CCACHE_DIR}"
-        export CCACHE_COMPRESS=1
-        export CCACHE_COMPRESSLEVEL=5
-        export CCACHE_MAXSIZE=10G
-        export CC="ccache ${clang_bin}/clang"
-        export CXX="ccache ${clang_bin}/clang++"
-    else
-        export CC="${clang_bin}/clang"
-        export CXX="${clang_bin}/clang++"
-    fi
+    export CC="${clang_bin}/clang"
+    export CXX="${clang_bin}/clang++"
     export AR="${clang_bin}/llvm-ar"
     export NM="${clang_bin}/llvm-nm"
     export LLVM_BIN="${clang_bin}"
