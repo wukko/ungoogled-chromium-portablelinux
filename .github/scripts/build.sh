@@ -4,24 +4,25 @@ set -euo pipefail
 . "/repo/scripts/shared.sh"
 
 setup_paths
-fetch_sources false
-apply_patches
-apply_domsub
-write_gn_args
-fix_tool_downloading
-setup_toolchain
-gn_gen
 
 _prepare_only="${_prepare_only:-0}"
 _task_timeout="${_task_timeout:-${TASK_TIMEOUT:-}}"
 
+if [ "${_prepare_only}" = "1" ]; then
+    fetch_sources false
+    apply_patches
+    apply_domsub
+    write_gn_args
+    fix_tool_downloading
+    setup_toolchain
+    gn_gen
+    echo "Preparation complete"
+    exit 0
+fi
+
 if [ -z "${_task_timeout}" ]; then
     echo "ERROR: _task_timeout (or TASK_TIMEOUT) must be set (seconds)" >&2
     exit 1
-fi
-
-if [ "${_prepare_only}" = "1" ]; then
-    exit 0
 fi
 
 # if already built, skip
