@@ -29,12 +29,6 @@ fetch_sources() {
         return 0
     fi
 
-    # clean up any partial extraction from previous failed runs
-    if [ -d "${_src_dir}" ]; then
-        echo "Cleaning up partial extraction from previous run"
-        rm -rf "${_src_dir}"
-    fi
-
     if ${use_clone}; then
         "${_main_repo}/utils/clone.py" --sysroot amd64 -o "${_src_dir}"
     else
