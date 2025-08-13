@@ -8,5 +8,4 @@ RUN apt -y update && apt -y upgrade
 RUN apt -y install binutils desktop-file-utils dpkg file imagemagick wget xz-utils pv curl jq
 
 ## Create and set WORKDIR to mount in docker build
-RUN mkdir /repo
 WORKDIR /repo
