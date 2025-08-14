@@ -14,7 +14,7 @@ setup_paths() {
     _root="$(repo_root)"
     _main_repo="${_root}/ungoogled-chromium"
     _build_dir="${_root}/build"
-    _dl_cache="${_build_dir}/_download_cache"
+    _dl_cache="${_build_dir}/download_cache"
     _src_dir="${_build_dir}/src"
     _out_dir="${_src_dir}/out/Default"
     mkdir -p "${_dl_cache}" "${_out_dir}"

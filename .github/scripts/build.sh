@@ -32,6 +32,7 @@ if [ -x "${_out_dir}/chrome" ] && [ -x "${_out_dir}/chromedriver" ]; then
     exit 0
 fi
 
+cd "$_src_dir"
 echo "Running ninja with timeout ${_task_timeout}s"
 set +e
 timeout --preserve-status -s INT "${_task_timeout}"s ninja -C out/Default chrome chromedriver
