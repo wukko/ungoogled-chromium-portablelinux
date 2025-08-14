@@ -4,10 +4,6 @@ description: Create GitHub release and upload packaged artifacts
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
-
     - name: Get version info
       id: version
       shell: bash
