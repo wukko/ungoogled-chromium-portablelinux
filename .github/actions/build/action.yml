@@ -15,6 +15,11 @@ inputs:
     required: false
     default: "false"
 
+outputs:
+  status:
+    description: "Build status: 'running' if build isn't complete, 'completed' if it is."
+    value: ${{ steps.build.outputs.status }}
+
 runs:
   using: composite
   steps:
@@ -43,6 +48,7 @@ runs:
       run: bash ./.github/scripts/import-cache.sh
 
     - name: Build
+      id: build
       shell: bash
       env:
         _task_timeout: ${{ inputs.task-timeout }}
