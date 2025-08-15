@@ -26,9 +26,9 @@ if [ -z "${_task_timeout}" ]; then
     exit 1
 fi
 
-# if already built, skip
+# if already fully compiled, skip
 if [ -x "${_out_dir}/chrome" ] && [ -x "${_out_dir}/chromedriver" ]; then
-    echo "Build artifacts already present"
+    echo "status=completed" >> "$GITHUB_OUTPUT"
     exit 0
 fi
 
@@ -41,7 +41,16 @@ set -e
 if [ "$rc" -eq 124 ]; then
     echo "Task timed out after ${_task_timeout}s; continuing in next run."
     command -v ccache >/dev/null 2>&1 && ccache -s || true
+    echo "status=running" >> "$GITHUB_OUTPUT"
     exit 0
 fi
 command -v ccache >/dev/null 2>&1 && ccache -s || true
+
+# check if build has fully finished on this run
+if [ "$rc" -eq 0 ] && [ -x "${_out_dir}/chrome" ] && [ -x "${_out_dir}/chromedriver" ]; then
+    echo "status=completed" >> "$GITHUB_OUTPUT"
+else
+    echo "status=running" >> "$GITHUB_OUTPUT"
+fi
+
 exit "$rc"
