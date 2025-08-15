@@ -23,25 +23,7 @@ runs:
 
     - name: List build artifacts
       shell: bash
-      run: |
-        echo "Build directory contents:"
-        ls -la build/
-        echo "AppImage files:"
-        find build/ -name "*.AppImage*" -ls || true
-        echo "Tar.xz files:"
-        find build/ -name "*.tar.xz" -ls || true
-
-    - name: Verify build artifacts
-      shell: bash
-      run: |
-        if ! find build/ -name "*.AppImage" | grep -q .; then
-          echo "ERROR: No AppImage found"
-          exit 1
-        fi
-        if ! find build/ -name "*.tar.xz" | grep -q .; then
-          echo "ERROR: No tar.xz archive found"
-          exit 1
-        fi
+      run: ls -la build/release/
 
     - name: Get version info
       id: version
@@ -59,9 +41,13 @@ runs:
       with:
         name: ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64-AppImage
         path: build/release/ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64.AppImage*
+        if-no-files-found: error
+        compression-level: 0
 
     - name: Upload tar.xz artifact
       uses: actions/upload-artifact@v4
       with:
         name: ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64-linux
         path: build/release/ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64_linux.tar.xz
+        if-no-files-found: error
+        compression-level: 0
