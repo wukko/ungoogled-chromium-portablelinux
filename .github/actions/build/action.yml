@@ -29,7 +29,6 @@ runs:
       with:
         name: docker-image
         path: /tmp
-      continue-on-error: false
 
     - name: Load Docker image
       if: ${{ inputs.use-existing-image == 'true' }}
@@ -37,13 +36,14 @@ runs:
       run: docker load -i /tmp/chromium-builder.tar
 
     - name: Download build cache
+      if: ${{ inputs.prepare-only != 'true' }}
       uses: actions/download-artifact@v4
       with:
         name: build-cache
         path: .github/cache/
-      continue-on-error: true
 
     - name: Import build cache
+      if: ${{ inputs.prepare-only != 'true' }}
       shell: bash
       run: bash ./.github/scripts/import-cache.sh
 
@@ -65,5 +65,5 @@ runs:
       with:
         name: build-cache
         path: .github/cache/build-cache.*
-        if-no-files-found: ignore
+        if-no-files-found: error
         overwrite: true
