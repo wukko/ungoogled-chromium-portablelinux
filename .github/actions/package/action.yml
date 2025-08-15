@@ -58,10 +58,10 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64-AppImage
-        path: build/ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64.AppImage*
+        path: build/release/ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64.AppImage*
 
     - name: Upload tar.xz artifact
       uses: actions/upload-artifact@v4
       with:
         name: ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64-linux
-        path: build/ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64_linux.tar.xz
+        path: build/release/ungoogled-chromium-${{ steps.version.outputs.version }}-x86_64_linux.tar.xz
