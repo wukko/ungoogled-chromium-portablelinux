@@ -13,6 +13,8 @@ fi
 
 mkdir -p "$(dirname "${_cache_tar}")"
 
+rm -rf "build/download_cache"
+
 # create archive via stream to avoid tar flag incompatibilities
 tar -cf - "build" | zstd -f -T0 -3 -o "${_cache_tar}"
 
