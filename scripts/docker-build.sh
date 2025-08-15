@@ -25,6 +25,7 @@ _extra_env=()
 [ -n "${TASK_TIMEOUT:-}" ] && _extra_env+=(-e "TASK_TIMEOUT")
 [ -n "${_prepare_only:-}" ] && _extra_env+=(-e "_prepare_only")
 [ -n "${_use_existing_image:-}" ] && _extra_env+=(-e "_use_existing_image")
+[ -n "${GITHUB_OUTPUT:-}" ] && _extra_env+=(-e GITHUB_OUTPUT)
 
 # match host user to avoid permission issues on bind mount
 _user_uidgid="$(id -u):$(id -g)"
@@ -32,9 +33,16 @@ _user_uidgid="$(id -u):$(id -g)"
 _build_start=$(date)
 echo "docker build start at ${_build_start}"
 
+_gha_mount=""
+
+if [ -n "${GITHUB_OUTPUT:-}" ]; then
+    _gha_mount="-v $GITHUB_OUTPUT:$GITHUB_OUTPUT"
+fi
+
 cd "${_base_dir}" && docker run --rm -i \
     -u "${_user_uidgid}" \
     -v "${_base_dir}:/repo" \
+    $_gha_mount \
     "${_extra_env[@]}" "${_image}" bash "${_entrypoint}" "$@"
 
 _build_end=$(date)
