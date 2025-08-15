@@ -201,8 +201,8 @@ jobs:
         with:
           use-existing-image: true
 
-  package:
-    name: Package AppImage
+  release:
+    name: Package AppImage and create release
     runs-on: ubuntu-latest
     if: ${{ !cancelled() && !failure()
             && contains(fromJSON('["success", "skipped"]'),
@@ -213,16 +213,6 @@ jobs:
         with:
           submodules: true
       - uses: ./.github/actions/package
-
-  release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    needs: [package]
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
       - uses: ./.github/actions/release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
