@@ -35,10 +35,9 @@ runs:
         ls -la release/
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1, pinned commit hash
       with:
         tag_name: ${{ steps.version.outputs.release_tag }}
-        name: ungoogled-chromium ${{ steps.version.outputs.version }} Linux
         draft: false
         prerelease: false
         files: |
