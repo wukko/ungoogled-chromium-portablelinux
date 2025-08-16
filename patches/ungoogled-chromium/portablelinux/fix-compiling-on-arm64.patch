@@ -1,0 +1,101 @@
+--- a/build/toolchain/linux/BUILD.gn
++++ b/build/toolchain/linux/BUILD.gn
+@@ -179,6 +179,13 @@ clang_v8_toolchain("clang_x64_v8_loong64
+   }
+ }
+ 
++clang_v8_toolchain("clang_arm64_v8_x64") {
++  toolchain_args = {
++    current_cpu = "arm64"
++    v8_current_cpu = "x64"
++  }
++}
++
+ gcc_toolchain("x64") {
+   cc = "gcc"
+   cxx = "g++"
+--- a/tools/rust/build_rust.py
++++ b/tools/rust/build_rust.py
+@@ -121,6 +121,7 @@ RUST_HOST_LLVM_INSTALL_DIR = os.path.joi
+ #   store the part after the `2@` here.
+ CIPD_DOWNLOAD_URL = f'https://chrome-infra-packages.appspot.com/dl'
+ OPENSSL_CIPD_LINUX_AMD_PATH = 'infra/3pp/static_libs/openssl/linux-amd64'
++OPENSSL_CIPD_LINUX_ARM_PATH = 'infra/3pp/static_libs/openssl/linux-arm64'
+ OPENSSL_CIPD_LINUX_AMD_VERSION = '1.1.1j.chromium.2'
+ OPENSSL_CIPD_MAC_AMD_PATH = 'infra/3pp/static_libs/openssl/mac-amd64'
+ OPENSSL_CIPD_MAC_AMD_VERSION = '1.1.1j.chromium.2'
+@@ -161,8 +162,12 @@ def AddOpenSSLToEnv():
+         ssl_url = (f'{CIPD_DOWNLOAD_URL}/{OPENSSL_CIPD_WIN_AMD_PATH}'
+                    f'/+/version:2@{OPENSSL_CIPD_WIN_AMD_VERSION}')
+     else:
+-        ssl_url = (f'{CIPD_DOWNLOAD_URL}/{OPENSSL_CIPD_LINUX_AMD_PATH}'
+-                   f'/+/version:2@{OPENSSL_CIPD_LINUX_AMD_VERSION}')
++        if platform.machine() == 'aarch64':
++            ssl_url = (f'{CIPD_DOWNLOAD_URL}/{OPENSSL_CIPD_LINUX_ARM_PATH}'
++                    f'/+/version:2@{OPENSSL_CIPD_LINUX_AMD_VERSION}')
++        else:
++            ssl_url = (f'{CIPD_DOWNLOAD_URL}/{OPENSSL_CIPD_LINUX_AMD_PATH}'
++                    f'/+/version:2@{OPENSSL_CIPD_LINUX_AMD_VERSION}')
+ 
+     if os.path.exists(ssl_dir):
+         RmTree(ssl_dir)
+@@ -515,7 +520,7 @@ def RustTargetTriple():
+     elif sys.platform == 'win32':
+         return 'x86_64-pc-windows-msvc'
+     else:
+-        return 'x86_64-unknown-linux-gnu'
++        return f'{platform.machine()}-unknown-linux-gnu'
+ 
+ 
+ # Build the LLVM libraries and install them .
+@@ -526,6 +531,9 @@ def BuildLLVMLibraries(skip_build):
+             sys.executable,
+             os.path.join(CLANG_SCRIPTS_DIR, 'build.py'),
+             '--disable-asserts',
++            '--use-system-cmake',
++            '--host-cc=clang',
++            '--host-cxx=clang++',
+             '--no-tools',
+             '--no-runtimes',
+             # PIC needed for Rust build (links LLVM into shared object)
+@@ -678,7 +686,13 @@ def main():
+         # Fetch sysroot we build rustc against. This ensures a minimum supported
+         # host (not Chromium target). Since the rustc linux package is for
+         # x86_64 only, that is the sole needed sysroot.
+-        debian_sysroot = DownloadDebianSysroot('amd64', args.skip_checkout)
++        sysroot_platform = platform.machine()
++        if sysroot_platform == 'x86_64':
++            sysroot_platform = 'amd64'
++        elif sysroot_platform == 'aarch64':
++            sysroot_platform = 'arm64'
++
++        debian_sysroot = DownloadDebianSysroot(sysroot_platform, args.skip_checkout)
+ 
+     # Require zlib compression.
+     if sys.platform == 'win32':
+--- a/tools/rust/cargo-config.toml.template
++++ b/tools/rust/cargo-config.toml.template
+@@ -21,3 +21,8 @@ host-config = true
+ # Use the same sysroot for host artifacts as target artifacts. Target rustflags
+ # are configured via environment variables.
+ rustflags = ["-Clink-arg=--sysroot=$DEBIAN_SYSROOT"]
++
++[host.aarch64-unknown-linux-gnu]
++# Use the same sysroot for host artifacts as target artifacts. Target rustflags
++# are configured via environment variables.
++rustflags = ["-Clink-arg=--sysroot=$DEBIAN_SYSROOT"]
+--- a/tools/rust/config.toml.template
++++ b/tools/rust/config.toml.template
+@@ -87,3 +87,12 @@ cc = "$LLVM_BIN/clang"
+ cxx = "$LLVM_BIN/clang++"
+ linker = "$LLVM_BIN/clang"
+ 
++[target.aarch64-unknown-linux-gnu]
++llvm-config = "$LLVM_BIN/llvm-config"
++# TODO(danakj): We don't ship this in the clang toolchain package.
++# ranlib = "$LLVM_BIN/llvm-ranlib"
++ar = "$LLVM_BIN/llvm-ar"
++cc = "$LLVM_BIN/clang"
++cxx = "$LLVM_BIN/clang++"
++linker = "$LLVM_BIN/clang"
++
