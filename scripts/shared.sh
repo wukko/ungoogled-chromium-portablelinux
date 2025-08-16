@@ -98,10 +98,5 @@ gn_gen() {
 
 maybe_build() {
     cd "${_src_dir}"
-    if [ -x "${_out_dir}/chrome" ] && [ -x "${_out_dir}/chromedriver" ]; then
-        echo "Build artifacts already present, skipping"
-        return 0
-    fi
     ninja -C out/Default chrome chromedriver
-    command -v ccache >/dev/null 2>&1 && ccache -s || true
 }
