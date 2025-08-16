@@ -8,11 +8,7 @@ _debian_ver=${1:-'trixie-slim'}
 
 _image="ungoogled-chromium-${_debian_ver}:packager"
 
-if ! docker image inspect "${_image}" >/dev/null 2>&1; then
-(
-    cd "${_root_dir}/docker" && docker buildx build --load -t "${_image}" -f ./package.Dockerfile .
-)
-fi
+docker buildx build --load -t "${_image}" -f "${_root_dir}/docker/package.Dockerfile" .
 
 [ -n "$(ls -A "${_root_dir}/${_git_submodule}" 2>/dev/null || true)" ] || git -C "${_root_dir}" submodule update --init --recursive
 

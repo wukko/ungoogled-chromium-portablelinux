@@ -2,18 +2,12 @@
 set -euxo pipefail
 
 _base_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && cd ../.. && pwd)"
-_cache_tar="${_base_dir}/.github/cache/build-cache.tar.zst"
+_cache_tar="${_base_dir}/.github/cache/build-cache-$ARCH.tar.zst"
 
-pushd "${_base_dir}" >/dev/null
+cd "$_base_dir"
 
-if [ ! -d "build" ]; then
-    echo "ERROR: No build directory found."
-    exit 1
-fi
+[ -d "build" ] || exit 1
 
-mkdir -p "$(dirname "${_cache_tar}")"
-
-# create archive via stream to avoid tar flag incompatibilities
+mkdir -p "$(dirname "$_cache_tar")"
+rm -rf "build/download_cache"
 tar -cf - "build" | zstd -f -T0 -3 -o "${_cache_tar}"
-
-popd >/dev/null
