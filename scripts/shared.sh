@@ -130,7 +130,7 @@ setup_toolchain() {
     fi
 
     mkdir -p "${_src_dir}/third_party/node/linux/node-linux-x64/bin"
-    ln -sf /usr/bin/node "${_src_dir}/third_party/node/linux/node-linux-x64/bin/node"
+    ln -sf "$(which node)" "${_src_dir}/third_party/node/linux/node-linux-x64/bin/node"
 
     local clang_bin="${_src_dir}/third_party/llvm-build/Release+Asserts/bin"
     export CC="${clang_bin}/clang"
