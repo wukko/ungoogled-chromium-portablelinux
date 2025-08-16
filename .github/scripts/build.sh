@@ -6,7 +6,7 @@ set -euxo pipefail
 setup_paths
 
 _prepare_only="${_prepare_only:-0}"
-_task_timeout="${_task_timeout:-${TASK_TIMEOUT:-}}"
+_task_timeout="${TASK_TIMEOUT}"
 
 if [ "${_prepare_only}" = "1" ]; then
     fetch_sources false
@@ -35,7 +35,7 @@ fi
 cd "$_src_dir"
 echo "Running ninja with timeout ${_task_timeout}s"
 set +e
-timeout --preserve-status -s INT "${_task_timeout}"s ninja -C out/Default chrome chromedriver
+timeout -k 5m -s INT "${_task_timeout}"s ninja -C out/Default chrome chromedriver
 rc=$?
 set -e
 if [ "$rc" -eq 124 ]; then
